@@ -1,0 +1,57 @@
+1.	Вивести книги у яких не введена ціна або ціна дорівнює 0
+SELECT * FROM `first_work` WHERE price is NULL OR price = 0;
+
+2.	 Вивести книги у яких введена ціна, але не введений тираж
+SELECT * FROM `first_work` WHERE price is NOT NULL AND circulation is NULL;
+
+3.	 Вивести книги, про дату видання яких нічого не відомо.
+SELECT * FROM `first_work` WHERE date is NULL;
+
+4.	 Вивести книги, з дня видання яких пройшло не більше року.
+SELECT * FROM `first_work` WHERE DATEDIFF(CURRENT_DATE,date)<=365;
+
+5.	 Вивести список книг-новинок, відсортованих за зростанням ціни
+SELECT * FROM `first_work` WHERE (new = "YES") ORDER BY price ASC;
+
+6.	 Вивести список книг з числом сторінок від 300 до 400, відсортованих в зворотному алфавітному порядку назв
+SELECT * FROM `first_work` WHERE (pages>300 AND pages <400) ORDER BY title DESC;
+
+7.	 Вивести список книг з ціною від 20 до 40, відсортованих за спаданням дати
+SELECT * FROM `first_work` WHERE (price > 20 AND price < 40) ORDER BY date DESC;
+8.	 Вивести список книг, відсортованих в алфавітному порядку назв і ціною по спадаючій 
+SELECT * FROM `first_work` ORDER BY title ASC, price DESC;
+
+9.	Вивести книги, у яких ціна однієї сторінки < 10 копійок.
+SELECT * FROM `first_work` WHERE (price / pages) < 0.10;
+
+10.	 Вивести значення наступних колонок: число символів в назві, перші 20 символів назви великими літерами
+SELECT LENGTH(title) AS number FROM `first_work`;
+SELECT UPPER(LEFT(title,20)) AS FIRST_20 FROM `first_work`;
+
+11.	 Вивести значення наступних колонок: перші 10 і останні 10 символів назви прописними буквами, розділені '...'
+SELECT CONCAT(LEFT(title, 10), '...', RIGHT(title, 10))  FROM `first_work`;
+
+12.	 Вивести значення наступних колонок: назва, дата, день, місяць, рік
+SELECT title, date, DAY(date) AS daydate, MONTH(date) AS monthdate, YEAR(date) AS yeardate FROM `first_work`;
+13.	 Вивести значення наступних колонок: назва, дата, дата в форматі 'dd / mm / yyyy'
+SELECT title, date, CONCAT(DAY(date),'/',MONTH(date),'/',YEAR(date)) AS DATE FROM `first_work`;
+14.	Вивести значення наступних колонок: код, ціна, ціна в грн., ціна в євро, ціна в руб.
+SELECT cipher, price, price*30.3 AS UAН, price*38.8 AS EUR, price*36.5 AS USD FROM `first_work`;
+
+15.	 Вивести значення наступних колонок: код, ціна, ціна в грн. без копійок, ціна без копійок округлена
+SELECT cipher, price, price * 30.3 AS UAН, TRUNCATE(price*30.3,0) AS UAН1, ROUND(price*30.3,0) AS UAН2 FROM `first_work`;
+16.	 Додати інформацію про нову книгу (всі колонки)
+INSERT INTO first_work(number, cipher, new, title, price, edition, pages, format, date, circulation, topic, category)
+VALUES(53, 786, 'YES', 'База даних', 28, 'Брюс Лі', 322, '60x84/16', '2023-01-10', 5000, 'Бази даних у житті', 'Інформаційні системи');
+
+17. Додати інформацію про нову книгу (колонки обов'язкові для введення)
+INSERT INTO first_work(number, cipher, title, price, edition, pages, format, date, circulation, topic, category)
+VALUES(244,2666,'Microsoft',100.69,'MN',464,'170x200/16','2022-05-24',700,'IT технології', 'Інші книги');
+18. Видалити книги, видані до 1990 року
+DELETE FROM first_work WHERE YEAR(date) < 1990;
+
+19. Проставити поточну дату для тих книг, у яких дата видання відсутня
+UPDATE first_work SET date = CURRENT_DATE WHERE date is NULL;
+
+20. Установити ознаку новинка для книг виданих після 2005 року
+UPDATE first_work SET new = 'YES' WHERE YEAR(date) >= 2005;
