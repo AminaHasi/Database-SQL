@@ -1,0 +1,155 @@
+
+/*1. Вивести значення наступних колонок: назва книги, ціна, назва видавництва. Використовувати внутрішнє з'єднання, застосовуючи where.*/
+SELECT
+    first_work.title,
+    first_work.price,
+    edition_public.edition_ AS edition_title
+FROM
+    first_work,
+    edition_public
+WHERE
+    first_work.id_edition = edition_public.id_edition;
+
+/*2. Вивести значення наступних колонок: назва книги, назва категорії. Використовувати внутрішнє з'єднання, застосовуючи inner join.*/
+SELECT
+    first_work.title,
+    category.category_ AS category_title
+FROM first_work
+INNER JOIN category ON first_work.id_category = category.id_category;
+
+/*3. Вивести значення наступних колонок: назва книги, ціна, назва видавництва, формат*/
+SELECT
+    first_work.title,
+    first_work.price,
+    edition_public.edition_ AS edition_title,
+    first_work.format AS FORMAT
+FROM
+    first_work
+JOIN edition_public ON first_work.id_edition = edition_public.id_edition;
+
+/*4. Вивести значення наступних колонок: тема, категорія, назва книги, назва видавництва. Фільтр по темам і категоріям.*/
+SELECT
+    first_work.title,
+    topic.topic_ AS topic_title,
+    category.category_ AS category,
+    edition_public.edition_ AS edition
+FROM
+    first_work
+JOIN topic ON first_work.id_topic = topic.id_topic
+JOIN category ON first_work.id_category = category.id_category
+JOIN edition_public ON first_work.id_edition = edition_public.id_edition
+ORDER BY
+    first_work.id_topic ASC,
+    category.category_ ASC;
+
+/*5. Вивести книги видавництва 'BHV', видані після 2000 р*/
+SELECT first_work.title AS 'Назва книги',YEAR(first_work.datee) AS 'Рік видавництва',
+edition_public.edition_ AS 'Видавництво' 
+FROM first_work
+INNER JOIN edition_public ON edition_public.id_edition=first_work.id_edition WHERE edition_public.edition_ LIKE"BHV%" AND YEAR(first_work.datee)>=2000;
+
+/*6. Вивести загальну кількість сторінок по кожній назві категорії. Фільтр по спадаючій кількості сторінок.*/
+SELECT
+    category.category_ AS category,
+    SUM(pages) AS pages_count
+FROM first_work
+JOIN category ON first_work.id_category = category.id_category
+GROUP BY category
+ORDER BY pages_count DESC;
+
+7.    Вивести середню вартість книг по темі 'Використання ПК' і категорії 'Linux'.
+SELECT AVG(first_work.price) AS 'Середня вартість',
+topic.topic_ AS 'Тема книги',
+category.category_ AS 'Категорія' 
+FROM 
+first_work
+INNER JOIN topic INNER JOIN category ON first_work.id_topic=topic.id_topic 
+AND first_work.id_category=category.id_category WHERE topic.topic_ LIKE '%Використання ПК%' OR category.category_ LIKE '%Linux%' GROUP BY topic.topic_, category.category_
+
+/*8. Вивести всі дані універсального відношення. Використовувати внутрішнє з'єднання, застосовуючи where.*/
+SELECT
+    first_work.*,
+    edition_public.edition_ AS edition_title,
+    category.category_ AS book_category,
+    topic.topic_ AS book_topic
+FROM
+    first_work,
+    edition_public,
+    category,
+    topic
+WHERE
+    first_work.id_edition = edition_public.id_edition AND first_work.id_category = category.id_category AND first_work.id_topic = topic.id_topic;
+
+/*9. Вивести всі дані універсального відношення. Використовувати внутрішнє з'єднання, застосовуючи inner join.*/
+SELECT
+    first_work.*,
+    edition_public.edition_ AS edition_title,
+    category.category_ AS book_category,
+    topic.topic_ AS book_topic
+FROM first_work
+INNER JOIN edition_public ON first_work.id_edition = edition_public.id_edition
+INNER JOIN category ON first_work.id_category = category.id_category
+INNER JOIN topic ON first_work.id_topic = topic.id_topic;
+
+/*10. Вивести всі дані універсального відношення. Використовувати зовнішнє з'єднання, застосовуючи left join / rigth join.*/
+SELECT
+    first_work.*,
+    edition_public.edition_ AS edition_title,
+    category.category_ AS book_category,
+    topic.topic_ AS book_topic
+FROM first_work
+LEFT JOIN edition_public ON first_work.id_edition = edition_public.id_edition
+LEFT JOIN category ON first_work.id_category = category.id_category
+LEFT JOIN topic ON first_work.id_topic = topic.id_topic;
+SELECT
+    first_work.*,
+    edition_public.edition_ AS edition_title,
+    category.category_ AS book_category,
+    topic.topic_ AS book_topic
+FROM first_work
+RIGHT JOIN edition_public ON first_work.id_edition = edition_public.id_edition
+RIGHT JOIN category ON first_work.id_category = category.id_category
+RIGHT JOIN topic ON first_work.id_topic = topic.id_topic;
+
+/*11.    Вивести пари книг, що мають однакову кількість сторінок. Використовувати само об’єднання і аліаси (self join).*/
+
+SELECT DISTINCT book1.title AS 'Книга 1',book2.title AS 'Книга 2' FROM first_work book1 JOIN first_work book2 ON book1.pages=book2.pages AND book1.id_edition!=book2.id_edition
+/*12. Вивести тріади книг, що мають однакову ціну. Використовувати самооб'єднання і аліаси (self join).*/
+SELECT A.title AS name1, B.title AS name2, C.title AS name3, A.price
+FROM first_work A, first_work B, first_work C
+WHERE A.title <> B.title <> C.title
+AND A.price = B.price = C.price
+ORDER BY A.price;
+
+?/*13. Вивести всі книги категорії 'C ++'. Використовувати підзапити (subquery).*/
+SELECT * from first_work WHERE id_category = (SELECT id_category FROM first_work WHERE first_work.id_category = 'C&C++');
+
+/*14. Вивести книги видавництва 'BHV', видані після 2000 р Використовувати підзапити (subquery).*/
+SELECT *
+FROM first_work
+WHERE id_category =(SELECT id_category FROM category WHERE category.category_ = 'BHV') AND YEAR(datee) > 2000;
+
+/*15. Вивести список видавництв, у яких розмір книг перевищує 400 сторінок. Використовувати пов'язані підзапити (correlated subquery).*/
+SELECT *
+FROM edition_public
+WHERE (SELECT MIN(pages) FROM first_work WHERE first_work.id_edition = edition_public.id_edition) >= 400;
+
+/*16. Вивести список категорій в яких більше 3-х книг. Використовувати пов'язані підзапити (correlated subquery).*/
+SELECT *
+FROM category
+WHERE(SELECT COUNT(*) FROM first_work WHERE first_work.id_category = category.id_category) > 3
+
+/*17. Вивести список книг видавництва 'BHV', якщо в списку є хоча б одна книга цього видавництва. Використовувати exists*/
+SELECT *
+FROM first_work
+WHERE EXISTS(SELECT * FROM edition_public WHERE edition_public.edition_ = 'BHV' AND first_work.id_edition = edition_public.id_edition);
+
+/*18. Вивести список книг видавництва 'BHV', якщо в списку немає жодної книги цього видавництва. Використовувати not exists.*/
+SELECT * FROM first_work WHERE NOT EXISTS (SELECT * FROM edition_public WHERE edition_public.edition_ = 'Видавнича група BHV' AND edition_public.id_edition= first_work.id_edition);
+
+/*19. Вивести відсортований загальний список назв тем і категорій. Використовувати union.*/
+
+ ((SELECT * FROM topic) UNION (SELECT * FROM category)) ORDER BY topic_;
+
+/*20. Вивести відсортований в зворотному порядку загальний список перших слів, назв книг і категорій що не повторюються. Використовувати union.*/
+SELECT DISTINCT title FROM ((SELECT REGEXP_SUBSTR(TRIM(first_work.title),'^[^\\s]+') AS title FROM first_work) UNION ALL(SELECT REGEXP_SUBSTR(TRIM(category.category_),'^[^\\s]+') AS 'Перше слово назви книги і категорій що не повторюються' FROM category)) first_work,category ORDER BY category_ DESC;
